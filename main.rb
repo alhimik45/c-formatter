@@ -1,13 +1,20 @@
 filename = ARGV[0] or abort("No file specified")
 code = File.read(filename)
 current_indent = 0
-prepared_code = code.gsub(/\n(\s*)\{/, "{\n\\1 ").
-						gsub(/\n(\s*)\}/, "}\n\\1 ").
-						gsub(/\{([^\{;\}\n])/, "{\n\\1").
-						gsub(/\}([^\{;\}\n])/, "}\n\\1").
-						gsub(/\s*\n\s*/, "\n")
+prepared_code = code.gsub(/\n(\s*)\{/, "{\n").
+					 gsub(/\n(\s*)\}/, "}\n").
+					 gsub(/\{([^\{;\}\n])/, "{\n\\1").
+					 gsub(/\}([^\{;\}\n])/, "}\n\\1").
+					 gsub(/\s*\n\s*/, "\n")
+while prepared_code != code
+	code = prepared_code
+	prepared_code = code.gsub(/\n(\s*)\{/, "{\n").
+						 gsub(/\n(\s*)\}/, "}\n").
+						 gsub(/\{([^\{;\}\n])/, "{\n\\1").
+						 gsub(/\}([^\{;\}\n])/, "}\n\\1").
+						 gsub(/\s*\n\s*/, "\n")
+end				 
 lines = prepared_code.split("\n")
-
 indented_lines = lines.map { |line|  
 	line = "    " * current_indent + line
 	m = (line+"\n").match(/[;\{\}]+\s*\n/)
@@ -39,11 +46,3 @@ puts indented_lines.map { |line|
 	brackets_str = m[0]
 	line[0..m.offset(0)[0]-1] + " " * (max_str_size - m.offset(0)[0]) + brackets_str.chomp
 }.join("\n")
-
-# $stderr.puts m.offset(0)
-# 	line[0..m.offset(0)[0]-1] + " " * (max_str_size - m.offset(0)[0]) + brackets_str.chomp
-
-
-
-
-
